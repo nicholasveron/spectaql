@@ -38,7 +38,9 @@ $border-size: 1px;
 $border-radius: 3px;
 
 $background-error: #fed7d8;
+$background-warning: #fdf145;
 $text-color-error: #c60609;
+$text-color-warning: #990003;
 
 $line-height: 1.6;
 $line-height-heading: 1.2;
@@ -520,6 +522,21 @@ $background-sidebar: $background-subtle;
 
       background: $background-error;
       color: $text-color-error;
+      font-weight: bold;
+      font-size: $font-size-small;
+    }
+  }
+
+  .experimental-reason {
+    word-break: break-word;
+    &::before {
+      display: inline;
+      content: 'Experimental';
+      padding: 2px math.div($content-padding, 4);
+      margin-right: math.div($content-padding, 4);
+
+      background: $background-warning;
+      color: $text-color-warning;
       font-weight: bold;
       font-size: $font-size-small;
     }

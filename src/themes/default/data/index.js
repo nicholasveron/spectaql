@@ -1,6 +1,7 @@
 import get from 'lodash/get'
 import sortBy from 'lodash/sortBy'
 import { Microfiber as IntrospectionManipulator } from 'microfiber'
+import { EXPERIMENTAL_PRE_POST_TAG } from '../../../addons/custom-directives/experimental'
 
 export default ({
   introspectionResponse,
@@ -39,10 +40,39 @@ export default ({
                   makeNavSection: true,
                   makeContentSection: true,
                   items: sortBy(
-                    queryType.fields.map((query) => ({
-                      ...query,
-                      isQuery: true,
-                    })),
+                    queryType.fields.map((query) => {
+                      let isExperimental = false
+                      let isDeprecated = false
+                      let deprecationReason = undefined
+                      let experimentalReason = undefined
+                      if (query?.deprecationReason) {
+                        isExperimental =
+                          query.deprecationReason.startsWith(
+                            EXPERIMENTAL_PRE_POST_TAG
+                          ) &&
+                          query.deprecationReason.endsWith(
+                            EXPERIMENTAL_PRE_POST_TAG
+                          )
+                        isDeprecated = query.isDeprecated && !isExperimental
+                        deprecationReason = isDeprecated
+                          ? query.deprecationReason
+                          : undefined
+                        experimentalReason = isExperimental
+                          ? query.deprecationReason.replaceAll(
+                              EXPERIMENTAL_PRE_POST_TAG,
+                              ''
+                            )
+                          : undefined
+                      }
+                      return {
+                        ...query,
+                        isQuery: true,
+                        isExperimental,
+                        isDeprecated,
+                        deprecationReason,
+                        experimentalReason,
+                      }
+                    }),
                     'name'
                   ),
                 }
@@ -53,10 +83,39 @@ export default ({
                   makeNavSection: true,
                   makeContentSection: true,
                   items: sortBy(
-                    mutationType.fields.map((query) => ({
-                      ...query,
-                      isMutation: true,
-                    })),
+                    mutationType.fields.map((query) => {
+                      let isExperimental = false
+                      let isDeprecated = false
+                      let deprecationReason = undefined
+                      let experimentalReason = undefined
+                      if (query?.deprecationReason) {
+                        isExperimental =
+                          query.deprecationReason.startsWith(
+                            EXPERIMENTAL_PRE_POST_TAG
+                          ) &&
+                          query.deprecationReason.endsWith(
+                            EXPERIMENTAL_PRE_POST_TAG
+                          )
+                        isDeprecated = query.isDeprecated && !isExperimental
+                        deprecationReason = isDeprecated
+                          ? query.deprecationReason
+                          : undefined
+                        experimentalReason = isExperimental
+                          ? query.deprecationReason.replaceAll(
+                              EXPERIMENTAL_PRE_POST_TAG,
+                              ''
+                            )
+                          : undefined
+                      }
+                      return {
+                        ...query,
+                        isMutation: true,
+                        isExperimental,
+                        isDeprecated,
+                        deprecationReason,
+                        experimentalReason,
+                      }
+                    }),
                     'name'
                   ),
                 }
@@ -64,13 +123,38 @@ export default ({
             hasSubscriptions
               ? {
                   name: 'Subscriptions',
-                  makeNavSection: true,
                   makeContentSection: true,
                   items: sortBy(
-                    subscriptionType.fields.map((type) => ({
-                      ...type,
-                      isSubscription: true,
-                    })),
+                    subscriptionType.fields.map((type) => {
+                      let isExperimental = false
+                      let isDeprecated = false
+                      let deprecationReason = undefined
+                      let experimentalReason = undefined
+                      if (type?.deprecationReason) {
+                        isExperimental =
+                          type.deprecationReason.startsWith(
+                            EXPERIMENTAL_PRE_POST_TAG
+                          ) &&
+                          type.deprecationReason.endsWith(
+                            EXPERIMENTAL_PRE_POST_TAG
+                          )
+                        isDeprecated = type.isDeprecated && !isExperimental
+                        deprecationReason = isDeprecated
+                          ? type.deprecationReason
+                          : undefined
+                        experimentalReason = isExperimental
+                          ? type.deprecationReason
+                          : undefined
+                      }
+                      return {
+                        ...type,
+                        isSubscription: true,
+                        isExperimental,
+                        isDeprecated,
+                        deprecationReason,
+                        experimentalReason,
+                      }
+                    }),
                     'name'
                   ),
                 }
@@ -83,10 +167,34 @@ export default ({
           name: 'Types',
           makeContentSection: true,
           items: sortBy(
-            otherTypes.map((type) => ({
-              ...type,
-              isType: true,
-            })),
+            otherTypes.map((type) => {
+              let isExperimental = false
+              let isDeprecated = false
+              let deprecationReason = undefined
+              let experimentalReason = undefined
+              if (type?.deprecationReason) {
+                isExperimental =
+                  type.deprecationReason.startsWith(
+                    EXPERIMENTAL_PRE_POST_TAG
+                  ) &&
+                  type.deprecationReason.endsWith(EXPERIMENTAL_PRE_POST_TAG)
+                isDeprecated = type.isDeprecated && !isExperimental
+                deprecationReason = isDeprecated
+                  ? type.deprecationReason
+                  : undefined
+                experimentalReason = isExperimental
+                  ? type.deprecationReason
+                  : undefined
+              }
+              return {
+                ...type,
+                isType: true,
+                isExperimental,
+                isDeprecated,
+                deprecationReason,
+                experimentalReason,
+              }
+            }),
             'name'
           ),
         }

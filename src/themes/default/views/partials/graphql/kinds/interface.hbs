@@ -26,6 +26,7 @@
               {{! The INTERFACE Types column }}
               <td>
                 {{md (mdTypeLink . codify=true) addClass=(ternary (and isDeprecated (not @root.info.x-hideIsDeprecated)) "definition-deprecated" false)}}
+                {{md (mdTypeLink . codify=true) addClass=(ternary (and isExperimental (not @root.info.x-hideIsExperimental)) "definition-experimental" false)}}
               </td>
             </tr>
           {{/each}}

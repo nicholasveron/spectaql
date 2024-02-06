@@ -9,7 +9,7 @@
     {{/if}}
   {{/unless}}
 
-  <h2 class="operation-heading {{#if (and isDeprecated (not @root.info.x-hideIsDeprecated)) }}operation-deprecated{{/if}}">
+  <h2 class="operation-heading {{#if (and isDeprecated (not @root.info.x-hideIsDeprecated)) }}operation-deprecated{{/if}}{{#if (and isExperimental (not @root.info.x-hideIsExperimental)) }}operation-experimental{{/if}}">
     {{md (codify name) stripParagraph="true"}}
   </h2>
 
@@ -19,6 +19,18 @@
         <div class="doc-copy-section">
           <div class="deprecation-reason">
             {{ md deprecationReason stripParagraph=true }}
+          </div>
+        </div>
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if (and experimentalReason (not @root.info.x-hideExperimentalReason))}}
+    <div class="doc-row">
+      <div class="doc-copy">
+        <div class="doc-copy-section">
+          <div class="experimental-reason">
+            {{ md experimentalReason stripParagraph=true }}
           </div>
         </div>
       </div>

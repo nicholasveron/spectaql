@@ -13,6 +13,7 @@
         <td data-property-name="{{./htmlId}}"
           {{! The Name column }}
           {{#if (and isDeprecated (not @root.info.x-hideIsDeprecated)) }}class="definition-deprecated"{{/if}}
+          {{#if (and isExperimental (not @root.info.x-hideIsExperimental)) }}class="definition-experimental"{{/if}}
         >
           {{~> graphql/name-and-type . }}
         </td>
@@ -23,6 +24,9 @@
           {{/if}}
           {{#if (and deprecationReason (not @root.info.x-hideDeprecationReason))}}
             <span class="deprecation-reason">{{ md deprecationReason stripParagraph=true }}</span>
+          {{/if}}
+          {{#if (and experimentalReason (not @root.info.x-hideExperimentalReason))}}
+            <span class="experimental-reason">{{ md experimentalReason stripParagraph=true }}</span>
           {{/if}}
         </td>
       </tr>

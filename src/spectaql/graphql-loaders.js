@@ -18,6 +18,10 @@ import request from 'sync-request'
 import { generateSpectaqlDirectiveSupport } from './directive'
 import { fileExtensionIs, readTextFile, fileToObject } from './utils'
 
+import { experimentalDirective } from '../addons/custom-directives/experimental'
+const { experimentalDirectiveTypeDefs, experimentalDirectiveTransformer } =
+  experimentalDirective()
+
 const GRAPHQL_LOAD_FILES_SUPPORTED_EXTENSIONS = [
   'gql',
   'graphql',
@@ -113,6 +117,7 @@ export const loadSchemaFromSDLFile = ({
     typeDefs: [
       directiveSdl,
       optionsSdl,
+      experimentalDirectiveTypeDefs,
       // I assume that these are processed in-order, so it's important to do the user-provided
       // SDL *after* the spectaql generated directive-related SDL so that if they've defined
       // or overridden things that will take precedence.
@@ -120,7 +125,12 @@ export const loadSchemaFromSDLFile = ({
     ],
   })
 
-  schema = transformer(schema)
+  const allTransformer = (schema) =>
+    [transformer, experimentalDirectiveTransformer].reduce(
+      (schemaInput, fn) => fn(schemaInput),
+      schema
+    )
+  schema = allTransformer(schema)
 
   return {
     schema,
