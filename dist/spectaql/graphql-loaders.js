@@ -100,7 +100,7 @@ const loadSchemaFromSDLFile = ({
   let directables = [];
 
   if (spectaqlDirectiveOptions.enable) {
-    ;({
+    ({
       directiveName,
       directiveSdl,
       optionsSdl,

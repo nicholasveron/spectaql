@@ -28,6 +28,31 @@ var _experimental = require("../../../addons/custom-directives/experimental");fu
   const hasSubscriptions = (0, _get.default)(subscriptionType, 'fields.length');
   const hasOtherTypes = (0, _get.default)(otherTypes, 'length');
 
+  const parseExperimentalFromDeprecation = (type, args = {}) => {
+    let isExperimental = false;
+    let isDeprecated = false;
+    let deprecationReason = undefined;
+    let experimentalReason = undefined;
+    if (type !== null && type !== void 0 && type.deprecationReason) {
+      isExperimental =
+      type.deprecationReason.startsWith(_experimental.EXPERIMENTAL_PRE_POST_TAG) &&
+      type.deprecationReason.endsWith(_experimental.EXPERIMENTAL_PRE_POST_TAG);
+      isDeprecated = type.isDeprecated && !isExperimental;
+      deprecationReason = isDeprecated ? type.deprecationReason : undefined;
+      experimentalReason = isExperimental ?
+      type.deprecationReason.replaceAll(_experimental.EXPERIMENTAL_PRE_POST_TAG, '') :
+      undefined;
+    }
+    return {
+      ...type,
+      ...args,
+      isExperimental,
+      isDeprecated,
+      deprecationReason,
+      experimentalReason
+    };
+  };
+
   return [
   hasQueriesOrMutations ?
   {
@@ -40,39 +65,11 @@ var _experimental = require("../../../addons/custom-directives/experimental");fu
       makeNavSection: true,
       makeContentSection: true,
       items: (0, _sortBy.default)(
-        queryType.fields.map((query) => {
-          let isExperimental = false;
-          let isDeprecated = false;
-          let deprecationReason = undefined;
-          let experimentalReason = undefined;
-          if (query !== null && query !== void 0 && query.deprecationReason) {
-            isExperimental =
-            query.deprecationReason.startsWith(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG
-            ) &&
-            query.deprecationReason.endsWith(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG
-            );
-            isDeprecated = query.isDeprecated && !isExperimental;
-            deprecationReason = isDeprecated ?
-            query.deprecationReason :
-            undefined;
-            experimentalReason = isExperimental ?
-            query.deprecationReason.replaceAll(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG,
-              ''
-            ) :
-            undefined;
-          }
-          return {
-            ...query,
-            isQuery: true,
-            isExperimental,
-            isDeprecated,
-            deprecationReason,
-            experimentalReason
-          };
-        }),
+        queryType.fields.map((query) =>
+        parseExperimentalFromDeprecation(query, {
+          isQuery: true
+        })
+        ),
         'name'
       )
     } :
@@ -83,39 +80,11 @@ var _experimental = require("../../../addons/custom-directives/experimental");fu
       makeNavSection: true,
       makeContentSection: true,
       items: (0, _sortBy.default)(
-        mutationType.fields.map((query) => {
-          let isExperimental = false;
-          let isDeprecated = false;
-          let deprecationReason = undefined;
-          let experimentalReason = undefined;
-          if (query !== null && query !== void 0 && query.deprecationReason) {
-            isExperimental =
-            query.deprecationReason.startsWith(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG
-            ) &&
-            query.deprecationReason.endsWith(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG
-            );
-            isDeprecated = query.isDeprecated && !isExperimental;
-            deprecationReason = isDeprecated ?
-            query.deprecationReason :
-            undefined;
-            experimentalReason = isExperimental ?
-            query.deprecationReason.replaceAll(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG,
-              ''
-            ) :
-            undefined;
-          }
-          return {
-            ...query,
-            isMutation: true,
-            isExperimental,
-            isDeprecated,
-            deprecationReason,
-            experimentalReason
-          };
-        }),
+        mutationType.fields.map((query) =>
+        parseExperimentalFromDeprecation(query, {
+          isMutation: true
+        })
+        ),
         'name'
       )
     } :
@@ -125,36 +94,11 @@ var _experimental = require("../../../addons/custom-directives/experimental");fu
       name: 'Subscriptions',
       makeContentSection: true,
       items: (0, _sortBy.default)(
-        subscriptionType.fields.map((type) => {
-          let isExperimental = false;
-          let isDeprecated = false;
-          let deprecationReason = undefined;
-          let experimentalReason = undefined;
-          if (type !== null && type !== void 0 && type.deprecationReason) {
-            isExperimental =
-            type.deprecationReason.startsWith(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG
-            ) &&
-            type.deprecationReason.endsWith(
-              _experimental.EXPERIMENTAL_PRE_POST_TAG
-            );
-            isDeprecated = type.isDeprecated && !isExperimental;
-            deprecationReason = isDeprecated ?
-            type.deprecationReason :
-            undefined;
-            experimentalReason = isExperimental ?
-            type.deprecationReason :
-            undefined;
-          }
-          return {
-            ...type,
-            isSubscription: true,
-            isExperimental,
-            isDeprecated,
-            deprecationReason,
-            experimentalReason
-          };
-        }),
+        subscriptionType.fields.map((type) =>
+        parseExperimentalFromDeprecation(type, {
+          isSubscription: true
+        })
+        ),
         'name'
       )
     } :
@@ -167,33 +111,16 @@ var _experimental = require("../../../addons/custom-directives/experimental");fu
     name: 'Types',
     makeContentSection: true,
     items: (0, _sortBy.default)(
-      otherTypes.map((type) => {
-        let isExperimental = false;
-        let isDeprecated = false;
-        let deprecationReason = undefined;
-        let experimentalReason = undefined;
-        if (type !== null && type !== void 0 && type.deprecationReason) {
-          isExperimental =
-          type.deprecationReason.startsWith(
-            _experimental.EXPERIMENTAL_PRE_POST_TAG
-          ) &&
-          type.deprecationReason.endsWith(_experimental.EXPERIMENTAL_PRE_POST_TAG);
-          isDeprecated = type.isDeprecated && !isExperimental;
-          deprecationReason = isDeprecated ?
-          type.deprecationReason :
-          undefined;
-          experimentalReason = isExperimental ?
-          type.deprecationReason :
-          undefined;
-        }
-        return {
-          ...type,
-          isType: true,
-          isExperimental,
-          isDeprecated,
-          deprecationReason,
-          experimentalReason
-        };
+      otherTypes.map((type) => {var _type$fields, _type$inputFields;
+        type.fields = (_type$fields = type.fields) === null || _type$fields === void 0 ? void 0 : _type$fields.map((field) =>
+        parseExperimentalFromDeprecation(field)
+        );
+        type.inputFields = (_type$inputFields = type.inputFields) === null || _type$inputFields === void 0 ? void 0 : _type$inputFields.map((field) =>
+        parseExperimentalFromDeprecation(field)
+        );
+        return parseExperimentalFromDeprecation(type, {
+          isType: true
+        });
       }),
       'name'
     )
