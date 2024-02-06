@@ -113,11 +113,29 @@ const loadSchemaFromSDLFile = ({
     }));
   }
 
+  const existingDirectives = mergedTypeDefs.definitions.
+  filter((typeDef) => typeDef.kind == 'DirectiveDefinition').
+  map((directiveTypeDef) => {var _directiveTypeDef$nam;return (
+      directiveTypeDef === null || directiveTypeDef === void 0 || (_directiveTypeDef$nam = directiveTypeDef.name) === null || _directiveTypeDef$nam === void 0 || (_directiveTypeDef$nam = _directiveTypeDef$nam.value) === null || _directiveTypeDef$nam === void 0 ? void 0 : _directiveTypeDef$nam.toString().toLowerCase());}
+  );
+  const applyDirectives = [experimentalDirectiveTypeDefs];
+  const filteredDirectives = applyDirectives.filter(
+    (directiveTypeDef) =>
+    !existingDirectives.includes(
+      directiveTypeDef.
+      split('(')[0].
+      split(' on')[0].
+      split('@')[1].
+      trim().
+      toLowerCase()
+    )
+  );
+
   let schema = (0, _schema.makeExecutableSchema)({
     typeDefs: [
     directiveSdl,
     optionsSdl,
-    experimentalDirectiveTypeDefs,
+    ...filteredDirectives,
 
 
 

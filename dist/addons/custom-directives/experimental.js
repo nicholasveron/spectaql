@@ -21,7 +21,7 @@ function experimentalDirective() {
   };
 
   return {
-    experimentalDirectiveTypeDefs: `directive @${EXPERIMENTAL_DIRECTIVE_NAME}(reason: String) on ${Object.keys(
+    experimentalDirectiveTypeDefs: `directive @${EXPERIMENTAL_DIRECTIVE_NAME}(reason: String = "") on ${Object.keys(
       supportedMapperKind
     ).join(' | ')}`,
 
