@@ -28,6 +28,31 @@ export default ({
   const hasSubscriptions = get(subscriptionType, 'fields.length')
   const hasOtherTypes = get(otherTypes, 'length')
 
+  const parseExperimentalFromDeprecation = (type, args = {}) => {
+    let isExperimental = false
+    let isDeprecated = false
+    let deprecationReason = undefined
+    let experimentalReason = undefined
+    if (type?.deprecationReason) {
+      isExperimental =
+        type.deprecationReason.startsWith(EXPERIMENTAL_PRE_POST_TAG) &&
+        type.deprecationReason.endsWith(EXPERIMENTAL_PRE_POST_TAG)
+      isDeprecated = type.isDeprecated && !isExperimental
+      deprecationReason = isDeprecated ? type.deprecationReason : undefined
+      experimentalReason = isExperimental
+        ? type.deprecationReason.replaceAll(EXPERIMENTAL_PRE_POST_TAG, '')
+        : undefined
+    }
+    return {
+      ...type,
+      ...args,
+      isExperimental,
+      isDeprecated,
+      deprecationReason,
+      experimentalReason,
+    }
+  }
+
   return [
     hasQueriesOrMutations
       ? {
@@ -40,39 +65,11 @@ export default ({
                   makeNavSection: true,
                   makeContentSection: true,
                   items: sortBy(
-                    queryType.fields.map((query) => {
-                      let isExperimental = false
-                      let isDeprecated = false
-                      let deprecationReason = undefined
-                      let experimentalReason = undefined
-                      if (query?.deprecationReason) {
-                        isExperimental =
-                          query.deprecationReason.startsWith(
-                            EXPERIMENTAL_PRE_POST_TAG
-                          ) &&
-                          query.deprecationReason.endsWith(
-                            EXPERIMENTAL_PRE_POST_TAG
-                          )
-                        isDeprecated = query.isDeprecated && !isExperimental
-                        deprecationReason = isDeprecated
-                          ? query.deprecationReason
-                          : undefined
-                        experimentalReason = isExperimental
-                          ? query.deprecationReason.replaceAll(
-                              EXPERIMENTAL_PRE_POST_TAG,
-                              ''
-                            )
-                          : undefined
-                      }
-                      return {
-                        ...query,
+                    queryType.fields.map((query) =>
+                      parseExperimentalFromDeprecation(query, {
                         isQuery: true,
-                        isExperimental,
-                        isDeprecated,
-                        deprecationReason,
-                        experimentalReason,
-                      }
-                    }),
+                      })
+                    ),
                     'name'
                   ),
                 }
@@ -83,39 +80,11 @@ export default ({
                   makeNavSection: true,
                   makeContentSection: true,
                   items: sortBy(
-                    mutationType.fields.map((query) => {
-                      let isExperimental = false
-                      let isDeprecated = false
-                      let deprecationReason = undefined
-                      let experimentalReason = undefined
-                      if (query?.deprecationReason) {
-                        isExperimental =
-                          query.deprecationReason.startsWith(
-                            EXPERIMENTAL_PRE_POST_TAG
-                          ) &&
-                          query.deprecationReason.endsWith(
-                            EXPERIMENTAL_PRE_POST_TAG
-                          )
-                        isDeprecated = query.isDeprecated && !isExperimental
-                        deprecationReason = isDeprecated
-                          ? query.deprecationReason
-                          : undefined
-                        experimentalReason = isExperimental
-                          ? query.deprecationReason.replaceAll(
-                              EXPERIMENTAL_PRE_POST_TAG,
-                              ''
-                            )
-                          : undefined
-                      }
-                      return {
-                        ...query,
+                    mutationType.fields.map((query) =>
+                      parseExperimentalFromDeprecation(query, {
                         isMutation: true,
-                        isExperimental,
-                        isDeprecated,
-                        deprecationReason,
-                        experimentalReason,
-                      }
-                    }),
+                      })
+                    ),
                     'name'
                   ),
                 }
@@ -125,36 +94,11 @@ export default ({
                   name: 'Subscriptions',
                   makeContentSection: true,
                   items: sortBy(
-                    subscriptionType.fields.map((type) => {
-                      let isExperimental = false
-                      let isDeprecated = false
-                      let deprecationReason = undefined
-                      let experimentalReason = undefined
-                      if (type?.deprecationReason) {
-                        isExperimental =
-                          type.deprecationReason.startsWith(
-                            EXPERIMENTAL_PRE_POST_TAG
-                          ) &&
-                          type.deprecationReason.endsWith(
-                            EXPERIMENTAL_PRE_POST_TAG
-                          )
-                        isDeprecated = type.isDeprecated && !isExperimental
-                        deprecationReason = isDeprecated
-                          ? type.deprecationReason
-                          : undefined
-                        experimentalReason = isExperimental
-                          ? type.deprecationReason
-                          : undefined
-                      }
-                      return {
-                        ...type,
+                    subscriptionType.fields.map((type) =>
+                      parseExperimentalFromDeprecation(type, {
                         isSubscription: true,
-                        isExperimental,
-                        isDeprecated,
-                        deprecationReason,
-                        experimentalReason,
-                      }
-                    }),
+                      })
+                    ),
                     'name'
                   ),
                 }
@@ -168,32 +112,15 @@ export default ({
           makeContentSection: true,
           items: sortBy(
             otherTypes.map((type) => {
-              let isExperimental = false
-              let isDeprecated = false
-              let deprecationReason = undefined
-              let experimentalReason = undefined
-              if (type?.deprecationReason) {
-                isExperimental =
-                  type.deprecationReason.startsWith(
-                    EXPERIMENTAL_PRE_POST_TAG
-                  ) &&
-                  type.deprecationReason.endsWith(EXPERIMENTAL_PRE_POST_TAG)
-                isDeprecated = type.isDeprecated && !isExperimental
-                deprecationReason = isDeprecated
-                  ? type.deprecationReason
-                  : undefined
-                experimentalReason = isExperimental
-                  ? type.deprecationReason
-                  : undefined
-              }
-              return {
-                ...type,
+              type.fields = type.fields?.map((field) =>
+                parseExperimentalFromDeprecation(field)
+              )
+              type.inputFields = type.inputFields?.map((field) =>
+                parseExperimentalFromDeprecation(field)
+              )
+              return parseExperimentalFromDeprecation(type, {
                 isType: true,
-                isExperimental,
-                isDeprecated,
-                deprecationReason,
-                experimentalReason,
-              }
+              })
             }),
             'name'
           ),
