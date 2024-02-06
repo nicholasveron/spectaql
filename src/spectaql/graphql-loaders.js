@@ -113,11 +113,29 @@ export const loadSchemaFromSDLFile = ({
     }))
   }
 
+  const existingDirectives = mergedTypeDefs.definitions
+    .filter((typeDef) => typeDef.kind == 'DirectiveDefinition')
+    .map((directiveTypeDef) =>
+      directiveTypeDef?.name?.value?.toString().toLowerCase()
+    )
+  const applyDirectives = [experimentalDirectiveTypeDefs]
+  const filteredDirectives = applyDirectives.filter(
+    (directiveTypeDef) =>
+      !existingDirectives.includes(
+        directiveTypeDef
+          .split('(')[0]
+          .split(' on')[0]
+          .split('@')[1]
+          .trim()
+          .toLowerCase()
+      )
+  )
+
   let schema = makeExecutableSchema({
     typeDefs: [
       directiveSdl,
       optionsSdl,
-      experimentalDirectiveTypeDefs,
+      ...filteredDirectives,
       // I assume that these are processed in-order, so it's important to do the user-provided
       // SDL *after* the spectaql generated directive-related SDL so that if they've defined
       // or overridden things that will take precedence.
